@@ -1,0 +1,6 @@
+{
+  "name": "CivicPulse - AI Civic Action & Triage Platform",
+  "description": "AI-powered civic impact platform transforming scattered citizen reports into prioritized, explainable, and trackable action with duplicate detection, hotspot clustering, and RAG action briefs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

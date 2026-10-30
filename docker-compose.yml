@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # 1. Frontend Web App (React 19 + Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  # 2. Backend Gateway (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=civic_user
+      - MYSQL_PASSWORD=civic_secret
+      - MYSQL_DB=civicpulse_db
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3:8b
+      - EMBEDDING_MODEL=nomic-embed-text
+    depends_on:
+      - mysql
+      - ollama
+
+  # 3. Relational Database (MySQL 8.0)
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: civicpulse_db
+      MYSQL_USER: civic_user
+      MYSQL_PASSWORD: civic_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  # 4. Local AI Engine (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+volumes:
+  mysql_data:
+  ollama_models:
